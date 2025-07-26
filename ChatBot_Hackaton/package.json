@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:ChatBot_Hackaton": "node dist/chat-bot-hackaton/server/server.mjs",
-    "vercel-build": "ng build --configuration production"
+    "vercel-build": "ng build --configuration production --output-hashing=all"
   },
   "private": true,
   "dependencies": {
