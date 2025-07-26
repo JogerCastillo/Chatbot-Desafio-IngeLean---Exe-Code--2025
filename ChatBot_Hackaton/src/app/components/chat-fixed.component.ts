@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef, ChangeDetectorRef, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatbotService } from '../services/chatbot.service';
 import { ChatMessage } from '../models/chat.model';
@@ -7,7 +8,7 @@ import { ChatMessage } from '../models/chat.model';
 @Component({
   selector: 'app-chat-fixed',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="chat-container">
       <div class="chat-header">
@@ -72,17 +73,17 @@ import { ChatMessage } from '../models/chat.model';
         <div class="input-container">
           <input 
             type="text" 
-            #messageInput
-            (input)="updateMessage(messageInput.value)"
-            (keydown.enter)="handleEnterKey($event, messageInput)"
+            [(ngModel)]="currentMessage"
+            (keyup.enter)="sendMessage()"
             placeholder="Escribe tu mensaje aquí..."
             [disabled]="isLoading"
-            class="message-input">
+            class="message-input"
+            #messageInput>
           <button 
-            (click)="sendMessage(messageInput)" 
-            [disabled]="!canSend()"
+            (click)="sendMessage()" 
+            [disabled]="isLoading || !currentMessage || currentMessage.trim() === ''"
             class="send-btn"
-            [ngClass]="{'enabled': canSend(), 'disabled': !canSend()}">
+            [ngClass]="{'enabled': !isLoading && currentMessage && currentMessage.trim() !== '', 'disabled': isLoading || !currentMessage || currentMessage.trim() === ''}">
             <span *ngIf="!isLoading">📨 Enviar</span>
             <span *ngIf="isLoading" class="loading-spinner">⏳ Enviando...</span>
           </button>
@@ -460,11 +461,12 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
   messages: ChatMessage[] = [];
   currentMessage: string = '';
   isLoading: boolean = false;
+  isBrowser: boolean = false;
   private subscription: Subscription = new Subscription();
 
   quickQuestions: string[] = [
     "¿Qué servicios ofrecen?",
-    "¿Dónde están ubicados?",
+    "¿Dónde están ubicados?", 
     "¿Desarrollan software personalizado?",
     "¿Ofrecen automatización industrial?",
     "¿Cómo los contacto?"
@@ -472,15 +474,18 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   constructor(
     private chatbotService: ChatbotService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
     this.subscription.add(
       this.chatbotService.messages$.subscribe(messages => {
         this.messages = messages;
         this.cdr.detectChanges();
-        this.scrollToBottom();
+        setTimeout(() => this.scrollToBottom(), 100);
       })
     );
   }
@@ -490,25 +495,13 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    this.scrollToBottom();
+    if (this.isBrowser) {
+      this.scrollToBottom();
+    }
   }
 
-  updateMessage(value: string): void {
-    this.currentMessage = value;
-    this.cdr.detectChanges();
-  }
-
-  handleEnterKey(event: Event, inputElement: HTMLInputElement): void {
-    event.preventDefault();
-    this.sendMessage(inputElement);
-  }
-
-  canSend(): boolean {
-    return !this.isLoading && this.currentMessage.trim().length > 0;
-  }
-
-  async sendMessage(inputElement?: HTMLInputElement): Promise<void> {
-    if (!this.canSend()) {
+  async sendMessage(): Promise<void> {
+    if (this.isLoading || !this.currentMessage || this.currentMessage.trim() === '') {
       return;
     }
 
@@ -516,39 +509,38 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
     const message = this.currentMessage.trim();
     this.currentMessage = '';
     
-    // Limpiar el input visual
-    if (inputElement) {
-      inputElement.value = '';
-    }
-    
-    this.cdr.detectChanges();
-
     try {
       await this.chatbotService.sendMessage(message);
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
       this.isLoading = false;
-      this.cdr.detectChanges();
     }
   }
 
   sendQuickQuestion(question: string): void {
+    if (this.isLoading) return;
+    
     this.currentMessage = question;
-    this.cdr.detectChanges();
     this.sendMessage();
   }
 
   formatTime(timestamp: Date): string {
+    if (!this.isBrowser || !timestamp) {
+      return '';
+    }
+    
     return new Intl.DateTimeFormat('es-CO', {
       hour: '2-digit',
       minute: '2-digit'
-    }).format(timestamp);
+    }).format(new Date(timestamp));
   }
 
   private scrollToBottom(): void {
+    if (!this.isBrowser) return;
+    
     try {
-      if (this.messagesContainer) {
+      if (this.messagesContainer?.nativeElement) {
         const element = this.messagesContainer.nativeElement;
         element.scrollTop = element.scrollHeight;
       }
