@@ -499,7 +499,7 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.cdr.detectChanges();
   }
 
-  handleEnterKey(event: KeyboardEvent): void {
+  handleEnterKey(event: Event): void {
     event.preventDefault();
     this.sendMessage();
   }

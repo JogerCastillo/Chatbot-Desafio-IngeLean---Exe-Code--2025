@@ -1,6 +1,6 @@
-# 🤖 Exe-Code - Chatbot Inteligente 2025
+# 🤖 Exe-Code - Chatbot Inteligente
 
-## 🏆 Proyecto Hackathon TalentoTECH 2025
+## 🏆 Proyecto Hackathon TalentoTECH
 
 **Sistema de Chat Inteligente con IA Avanzada**
 
@@ -77,7 +77,7 @@ npm start
 | Usuarios simultáneos | 3 mín | ✅ 5+ |
 | Disponibilidad | 24/7 | ✅ 100% |
 
-### 🏗️ Arquitectura del Sistema
+### Arquitectura del Sistema
 
 ```
 src/
@@ -128,15 +128,6 @@ model: 'microsoft/DialoGPT-medium'
 
 ### 👥 Equipo de Desarrollo
 
-Desarrollado con ❤️ para el Hackathon TalentoTECH 2025
-
-### 📞 Contacto
-
-**INGE LEAN S.A.S.**
-- 📍 Pereira, Risaralda, Colombia
-- 🌐 Especialistas en soluciones tecnológicas desde 2013
-- 🤖 Innovación en IA y automatización industrial
-
----
+Desarrollado con ❤️ para el Hackathon TalentoTECH
 
 **¡Gracias por probar nuestro chatbot inteligente!** 🚀
