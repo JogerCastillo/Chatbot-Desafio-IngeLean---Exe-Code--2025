@@ -1,0 +1,92 @@
+:host {
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --success-color: #4CAF50;
+  --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  display: block;
+  min-height: 100vh;
+  background: var(--background-gradient);
+}
+
+.main-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--background-gradient);
+}
+
+.header-section {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.header-section h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.header-section p {
+  font-size: 16px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+  align-items: start;
+}
+
+.chat-section {
+  width: 100%;
+  max-width: 800px;
+}
+
+.stats-section {
+  width: 300px;
+  min-width: 280px;
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .stats-section {
+    width: 100%;
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 10px;
+  }
+  
+  .header-section h1 {
+    font-size: 22px;
+  }
+  
+  .header-section p {
+    font-size: 14px;
+  }
+}
