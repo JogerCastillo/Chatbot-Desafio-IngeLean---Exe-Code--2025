@@ -72,15 +72,14 @@ import { ChatMessage } from '../models/chat.model';
         <div class="input-container">
           <input 
             type="text" 
-            [value]="currentMessage" 
-            (input)="updateMessage($event)"
-            (keydown.enter)="handleEnterKey($event)"
+            #messageInput
+            (input)="updateMessage(messageInput.value)"
+            (keydown.enter)="handleEnterKey($event, messageInput)"
             placeholder="Escribe tu mensaje aquí..."
             [disabled]="isLoading"
-            class="message-input"
-            #messageInput>
+            class="message-input">
           <button 
-            (click)="sendMessage()" 
+            (click)="sendMessage(messageInput)" 
             [disabled]="!canSend()"
             class="send-btn"
             [ngClass]="{'enabled': canSend(), 'disabled': !canSend()}">
@@ -494,21 +493,21 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.scrollToBottom();
   }
 
-  updateMessage(event: any): void {
-    this.currentMessage = event.target.value;
+  updateMessage(value: string): void {
+    this.currentMessage = value;
     this.cdr.detectChanges();
   }
 
-  handleEnterKey(event: Event): void {
+  handleEnterKey(event: Event, inputElement: HTMLInputElement): void {
     event.preventDefault();
-    this.sendMessage();
+    this.sendMessage(inputElement);
   }
 
   canSend(): boolean {
     return !this.isLoading && this.currentMessage.trim().length > 0;
   }
 
-  async sendMessage(): Promise<void> {
+  async sendMessage(inputElement?: HTMLInputElement): Promise<void> {
     if (!this.canSend()) {
       return;
     }
@@ -516,6 +515,12 @@ export class ChatFixedComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.isLoading = true;
     const message = this.currentMessage.trim();
     this.currentMessage = '';
+    
+    // Limpiar el input visual
+    if (inputElement) {
+      inputElement.value = '';
+    }
+    
     this.cdr.detectChanges();
 
     try {
